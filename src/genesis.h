@@ -2,6 +2,8 @@
 #define GENESIS_H
 
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 //Size of memory and program
 #define SIZE (1 << 16)
@@ -30,6 +32,14 @@
 typedef struct VM VM;
 // typedef enum regist reg;
 typedef void (*op_ex_f)(VM *vm, uint32_t instruction);
+
+typedef enum OPCODES
+{
+    MOV_OP,
+    STR_OP,
+    ADD_OP,
+    SUB_OP
+} OPCODES;
 
 //Registers
 enum regist
@@ -99,7 +109,7 @@ struct VM
     uint8_t memory[SIZE];
 };
 
-op_ex_f op_ex[NOPS];
+extern op_ex_f op_ex[NOPS];
 
 extern VM* createVM();
 
@@ -114,6 +124,6 @@ extern void mem_write(VM *vm, uint16_t address, uint8_t val);
 
 extern void clear(VM *vm);
 
-extern void start(VM *vm, uint32_t *ops, int size);
+extern void start(VM *vm, uint32_t *ops, uint32_t size);
 
 #endif

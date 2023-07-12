@@ -1,5 +1,5 @@
 #include "genesis.h"
-#include "debug.h"
+#include "../debug/debug.h"
 
 //Move
 void MOV(VM *vm, uint32_t i)
@@ -301,3 +301,10 @@ void RET(VM *vm, uint32_t i){}
 /********************************************/
 
 void INT(VM *vm, uint32_t i){}
+
+op_ex_f op_ex[NOPS] = {
+    MOV,
+    STR,
+    ADD,
+    SUB
+};

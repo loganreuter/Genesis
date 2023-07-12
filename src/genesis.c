@@ -58,9 +58,9 @@ void clear(VM *vm){
 }
 
 //Starts the virtual machine
-void start(VM *vm, uint32_t *ops, int size){
+void start(VM *vm, uint32_t *ops, uint32_t size){
     //loads instructions into memory
-    for (int i = 0; i < size; i++){
+    for (uint32_t i = 0; i < size; i++){
         vm->program[i] = *(ops++);
     }
 
