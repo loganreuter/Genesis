@@ -8,7 +8,7 @@ void MOV(VM *vm, uint32_t i)
     if(MODE(i) >> 2)
     {
         debug("MOV", "MOV %s [%Xh]", name(SR1(i)), IMM16(i));
-        vm->registers[SR1(i)] = IMM16(i);
+        vm->registers[SR1(i)] = mem_readn(vm, IMM16(i), 4);
     } 
     //Register-IMM32
     else if ((MODE(i) >> 1) & 0x1)
@@ -30,7 +30,7 @@ void STR(VM *vm, uint32_t i)
     //Memory-Register
     if(MODE(i) >> 2)
     {
-        debug("STR", "STR [%Xh] %s", IMM16(i), SR1(i));
+        debug("STR", "STR [%Xh] %s", IMM16(i), name(SR1(i)));
         for(uint16_t j = 0; j < 5; j++){
             mem_write(vm, IMM16(i) + j, ENCODE(vm->registers[SR1(i)], j));
         }
@@ -40,7 +40,7 @@ void STR(VM *vm, uint32_t i)
     {
         debug("STR", "STR [%Xh] %Xh", IMM16(i), prog_read(vm, vm->registers[PC]));
         for(uint16_t j = 0; j < 5; j++){
-            mem_write(vm, IMM16(i) + j, ENCODE(vm->registers[PC], j));
+            mem_write(vm, IMM16(i) + j, ENCODE(prog_read(vm, vm->registers[PC]), j));
         }
         vm->registers[PC]++;
     }
@@ -59,23 +59,24 @@ void STR(VM *vm, uint32_t i)
 //Add
 void ADD(VM *vm, uint32_t i)
 {
-    //INC
-    if(MODE(i) >> 2)
+    switch(MODE(i))
     {
-        debug("ADD", "INC %s", name(SR1(i)));
-        vm->registers[SR1(i)]++;
-    }
-    //IADD
-    else if ((MODE(i) >> 1) & 0x1)
-    {
-        debug("ADD", "IADD %s %Xh", name(SR1(i)), prog_read(vm, vm->registers[PC]));
-        vm->registers[SR1(i)] += prog_read(vm, vm->registers[PC]++);
-    }
-    //ADD
-    else if (MODE(i) & 0x1)
-    {
-        debug("ADD", "ADD %s %s", name(SR1(i)), name(SR2(i)));
-        vm->registers[SR1(i)] += vm->registers[SR2(i)];
+        //ADD
+        case 0b001:
+            debug("ADD", "ADD %s %s", name(SR1(i)), name(SR2(i)));
+            vm->registers[SR1(i)] += vm->registers[SR2(i)];
+            break;
+        case 0b010:
+            debug("ADD", "IADD %s %Xh", name(SR1(i)), prog_read(vm, vm->registers[PC]));
+            vm->registers[SR1(i)] += prog_read(vm, vm->registers[PC]++);
+            break;
+        case 0b100:
+            debug("ADD", "INC %s", name(SR1(i)));
+            vm->registers[SR1(i)]++;
+            break;
+        default:
+            perror("Unknown mode");
+            exit(EXIT_FAILURE);
     }
     update_flag(vm, SR1(i));
 }
