@@ -4,7 +4,7 @@ project(
     Genesis
     VERSION 0.1
     DESCRIPTION "A 32-Bit virtual machine"
-    LANGUAGE C
+    LANGUAGES C
 )
 
 add_subdirectory(src)
