@@ -1,0 +1,5 @@
+Switch memory/program memory to 2^32 bits wide
+Switch to using hex modes instead of binary
+    Rewrite tests
+Add compare with immediate value
+Add tests to verify jumps function as intended when failing
