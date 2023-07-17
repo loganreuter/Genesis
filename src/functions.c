@@ -4,52 +4,62 @@
 //Move
 void MOV(VM *vm, uint32_t i)
 {
-    //Register-Memory
-    if(MODE(i) >> 2)
+    switch(MODE(i))
     {
-        debug("MOV", "MOV %s [%Xh]", name(SR1(i)), IMM16(i));
-        vm->registers[SR1(i)] = mem_readn(vm, IMM16(i), 4);
-    } 
-    //Register-IMM32
-    else if ((MODE(i) >> 1) & 0x1)
-    {
-        debug("MOV", "MOV %s %Xh", name(SR1(i)), prog_read(vm, vm->registers[PC]));
-        vm->registers[SR1(i)] = prog_read(vm, vm->registers[PC]++);
-    }
-    //Register-Register
-    else if (MODE(i) & 0x1)
-    {
-        debug("MOV", "MOV %s %s", name(SR1(i)), name(SR2(i)));
-        vm->registers[SR1(i)] = vm->registers[SR2(i)];
+        //Register-Register
+        case 0b001:
+            debug("MOV", "MOV %s %s", name(SR1(i)), name(SR2(i)));
+            vm->registers[SR1(i)] = vm->registers[SR2(i)];
+            break;
+        //Register-IMM32
+        case 0b010:
+            debug("MOV", "MOV %s %Xh", name(SR1(i)), prog_read(vm, vm->registers[PC]));
+            vm->registers[SR1(i)] = prog_read(vm, vm->registers[PC]++);
+            break;
+        //Register-Memory
+        case 0b100:
+            debug("MOV", "MOV %s [%Xh]", name(SR1(i)), IMM16(i));
+            vm->registers[SR1(i)] = mem_readn(vm, IMM16(i), 4);
+            break;
+        default:
+            perror("MOV - Unknown mode");
+            exit(EXIT_FAILURE);
+            break;
     }
 }
 
 //Store
 void STR(VM *vm, uint32_t i)
-{   
-    //Memory-Register
-    if(MODE(i) >> 2)
+{
+    switch(MODE(i))
     {
-        debug("STR", "STR [%Xh] %s", IMM16(i), name(SR1(i)));
-        for(uint16_t j = 0; j < 5; j++){
-            mem_write(vm, IMM16(i) + j, ENCODE(vm->registers[SR1(i)], j));
-        }
-    }
-    //Memory-IMM32
-    else if ((MODE(i) >> 1) & 0x1)
-    {
-        debug("STR", "STR [%Xh] %Xh", IMM16(i), prog_read(vm, vm->registers[PC]));
-        for(uint16_t j = 0; j < 5; j++){
-            mem_write(vm, IMM16(i) + j, ENCODE(prog_read(vm, vm->registers[PC]), j));
-        }
-        vm->registers[PC]++;
-    }
-    //Memory-Memory
-    else if (MODE(i) & 0x1)
-    {
-        debug("STR", "STR [%Xh] [%Xh]", IMM16(i), prog_read(vm, vm->registers[PC]));
-        mem_write(vm, IMM16(i), mem_read(vm, prog_read(vm, vm->registers[PC]++)));
-    }
+        //Memory-Memory
+        case 0b001:
+            debug("STR", "STR [%Xh] [%Xh]", IMM16(i), prog_read(vm, vm->registers[PC]));
+            mem_write(vm, IMM16(i), mem_read(vm, prog_read(vm, vm->registers[PC]++)));
+            break;
+        //Memory-IMM32
+        case 0b010:
+            debug("STR", "STR [%Xh] %Xh", IMM16(i), prog_read(vm, vm->registers[PC]));
+            for (uint16_t j = 0; j < 5; j++)
+            {
+                mem_write(vm, IMM16(i) + j, ENCODE(prog_read(vm, vm->registers[PC]), j));
+            }
+            vm->registers[PC]++;
+            break;
+        //Memory-Register
+        case 0b100:
+            debug("STR", "STR [%Xh] %s", IMM16(i), name(SR1(i)));
+            for (uint16_t j = 0; j < 5; j++)
+            {
+                mem_write(vm, IMM16(i) + j, ENCODE(vm->registers[SR1(i)], j));
+            }
+            break;
+        default:
+            perror("STR - Unknown mode");
+            exit(EXIT_FAILURE);
+            break;
+    }   
 }
 
 /********************************************/
@@ -75,7 +85,7 @@ void ADD(VM *vm, uint32_t i)
             vm->registers[SR1(i)]++;
             break;
         default:
-            perror("Unknown mode");
+            perror("ADD - Unknown mode");
             exit(EXIT_FAILURE);
     }
     update_flag(vm, SR1(i));
@@ -159,26 +169,26 @@ void MOD(VM *vm, uint32_t i)
     update_flag(vm, SR1(i));
 }
 
-//Shift
+/********************************************/
+// Bitwise
+/********************************************/
+
+// Shift
 void SH(VM *vm, uint32_t i)
 {
-    //SHR
-    if((MODE(i) >> 1) & 0x1)
+    // SHR
+    if ((MODE(i) >> 1) & 0x1)
     {
         debug("SH", "SHR %s %Xh", name(SR1(i)), prog_read(vm, vm->registers[PC]));
         vm->registers[SR1(i)] >>= prog_read(vm, vm->registers[PC]++);
-    } 
-    //SHL
-    else if(MODE(i) & 0x1)
+    }
+    // SHL
+    else if (MODE(i) & 0x1)
     {
         debug("SH", "SHL %s %Xh", name(SR1(i)), prog_read(vm, vm->registers[PC]));
         vm->registers[SR1(i)] <<= prog_read(vm, vm->registers[PC]++);
     }
 }
-
-/********************************************/
-// Logical
-/********************************************/
 
 void AND(VM *vm, uint32_t i)
 {
@@ -207,7 +217,7 @@ void XOR(VM *vm, uint32_t i)
 void TEST(VM *vm, uint32_t i)
 {
     debug("TEST", "TEST %s %s", name(SR1(i)), name(SR2(i)));
-    update_flag(vm, vm->registers[SR1(i)] & vm->registers[SR2(i)]);
+    update_flag_imm(vm, vm->registers[SR1(i)] & vm->registers[SR2(i)]);
 }
 
 void NOT(VM *vm, uint32_t i)
@@ -307,5 +317,17 @@ op_ex_f op_ex[NOPS] = {
     MOV,
     STR,
     ADD,
-    SUB
+    SUB,
+    MUL,
+    DIV,
+    MOD,
+    SH,
+    AND,
+    OR,
+    XOR,
+    TEST,
+    NOT,
+    CMP,
+    JMP,
+    JUMP
 };

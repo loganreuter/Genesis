@@ -38,7 +38,19 @@ typedef enum OPCODES
     MOV_OP,
     STR_OP,
     ADD_OP,
-    SUB_OP
+    SUB_OP,
+    MUL_OP,
+    DIV_OP,
+    MOD_OP,
+    SH_OP,
+    AND_OP,
+    OR_OP,
+    XOR_OP,
+    TEST_OP,
+    NOT_OP,
+    CMP_OP,
+    JMP_OP,
+    JUMP_OP
 } OPCODES;
 
 //Registers
