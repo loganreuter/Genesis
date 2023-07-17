@@ -49,10 +49,27 @@ uint32_t MCM32(OPCODES op, uint8_t mode, uint16_t addr)
     return mc;
 }
 
-void ASSERT_EQ(uint32_t val, uint32_t check){
-    if(val == check){
+int ASSERT_EQ(uint32_t val, uint32_t check)
+{
+    if(val == check)
+    {
         printf("\033[32mTest Passed!\033[0m\n");
-    } else {
+    } else 
+    {
         printf("\033[31mFAILED!\033[0m\nExpected: x%X\nFound: x%X\n", check, val);
     }   
+    return val == check;
+}
+
+int ASSERT_NEQ(uint32_t val, uint32_t check)
+{
+    if (val != check)
+    {
+        printf("\033[32mTest Passed!\033[0m\n");
+    }
+    else
+    {
+        printf("\033[31mFAILED!\033[0m\nExpected: x%X\nFound: x%X\n", check, val);
+    }
+    return val != check;
 }

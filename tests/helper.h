@@ -6,7 +6,8 @@
 
 #include "../src/genesis.h"
 
-void ASSERT_EQ(uint32_t val, uint32_t check);
+int ASSERT_EQ(uint32_t val, uint32_t check);
+int ASSERT_NEQ(uint32_t val, uint32_t check);
 
 uint32_t MCRR(OPCODES op, uint8_t mode, enum regist r1, enum regist r2);
 
