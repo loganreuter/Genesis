@@ -50,7 +50,6 @@ typedef enum OPCODES
     NOT_OP,
     CMP_OP,
     JMP_OP,
-    JUMP_OP
 } OPCODES;
 
 //Registers
