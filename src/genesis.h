@@ -9,7 +9,7 @@
 #define SIZE (1 << 16)
 
 //Number of operations
-#define NOPS (16)
+#define NOPS (1 << 5)
 
 //Extract Op Code
 #define OpCode(i) ((i) >> 26)
@@ -50,6 +50,12 @@ typedef enum OPCODES
     NOT_OP,
     CMP_OP,
     JMP_OP,
+    PUSH_OP,
+    POP_OP,
+    CALL_OP,
+    RET_OP,
+    INT_OP,
+    NUM_OF_OPS
 } OPCODES;
 
 //Registers

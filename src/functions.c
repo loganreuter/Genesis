@@ -386,7 +386,7 @@ void JMP(VM *vm, uint32_t i)
         // JGE
         case 0x4:
             debug("JMP", "JGE %Xh", IMM16(i));
-            if (!(vm->registers[FLAG] - ZF))
+            if (!(vm->registers[FLAG] & SF) || vm->registers[FLAG] & ZF)
                 vm->registers[PC] = IMM16(i);
             break;
         // JL
@@ -420,9 +420,9 @@ void PUSH(VM *vm, uint32_t i)
         case 0x0:
             debug("PUSH", "PUSH %s", name(SR1(i)));
             vm->registers[ESP] -= 4;
-            for(uint16_t i; i < 4; i++)
+            for(uint16_t j = 0; j < 4; j++)
             {
-                mem_write(vm, vm->registers[ESP] - i, ENCODE(vm->registers[EAX], i));
+                mem_write(vm, vm->registers[ESP] - j, ENCODE(vm->registers[EAX], j));
             }
             break;
         //PUSH (IMM32)
@@ -430,9 +430,9 @@ void PUSH(VM *vm, uint32_t i)
             debug("PUSH", "PUSH 0x%X", prog_read(vm, vm->registers[PC]));
             vm->registers[ESP] -= 4;
             uint32_t val = prog_read(vm, vm->registers[PC]++);
-            for (uint16_t i; i < 4; i++)
+            for (uint16_t j = 0; j < 4; j++)
             {
-                mem_write(vm, vm->registers[ESP] - i, ENCODE(val, i));
+                mem_write(vm, vm->registers[ESP] - j, ENCODE(val, j));
             }
             break;
         default:
@@ -467,9 +467,30 @@ void RET(VM *vm, uint32_t i){}
 // Interrupt
 /********************************************/
 
-void INT(VM *vm, uint32_t i){}
+void INT(VM *vm, uint32_t i)
+{
+    debug("INT", "INT x%X", IMM16(i));
+    switch (IMM16(i))
+    {
+    case 0x0:
+        break;
+    case 0x1:
+        break;
+    case 0x2:
+        break;
+    //Print Character
+    case 0x10:
+        char c = vm->registers[EAX];
+        fputc(c, stdout);
+        break;
+    default:
+        perror("INT - Unknown Interrupt");
+        exit(EXIT_FAILURE);
+        break;
+    }
+}
 
-op_ex_f op_ex[] = {
+op_ex_f op_ex[NOPS] = {
     MOV,
     STR,
     ADD,
