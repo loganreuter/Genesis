@@ -1,5 +1,4 @@
-add_library(genesis_lib genesis.c functions.c)
+file(GLOB Sources *.c)
+file(GLOB Headers *.h)
 
-# target_include_directories()
-
-target_compile_features(genesis_lib INTERFACE CMAKE_C_COMPILE_FEATURES)
+add_library(GenesisLib SHARED ${Sources} ${Headers})
