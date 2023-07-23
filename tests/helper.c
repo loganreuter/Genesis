@@ -53,7 +53,7 @@ int ASSERT_EQ(uint32_t val, uint32_t check)
 {
     if(val == check)
     {
-        printf("\033[32mTest Passed!\033[0m\n");
+        fputs("\033[32mTest Passed!\033[0m\n", stdout);
     } else 
     {
         printf("\033[31mFAILED!\033[0m\nExpected: x%X\nFound: x%X\n", check, val);
@@ -65,7 +65,7 @@ int ASSERT_NEQ(uint32_t val, uint32_t check)
 {
     if (val != check)
     {
-        printf("\033[32mTest Passed!\033[0m\n");
+        fputs("\033[32mTest Passed!\033[0m\n", stdout);
     }
     else
     {
