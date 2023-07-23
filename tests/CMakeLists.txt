@@ -2,14 +2,19 @@ cmake_minimum_required(VERSION 3.14)
 
 project(
     Tests
-    VERSION 1.0
+    VERSION 0.1
     DESCRIPTION "Testing for genesis"
     LANGUAGES C
 )
 
+file(GLOB Sources *.c)
+file(GLOB Headers *.h)
 
-add_library(GenesisLib ../src/genesis.c ../src/functions.c)
+file(GLOB LIB_SOURCES ../src/*.c)
+file(GLOB LIB_HEADERS ../src/*.h)
 
-add_executable(test tests.c helper.c)
+add_library(GenesisLib ${LIB_SOURCES} ${LIB_HEADERS})
+
+add_executable(test ${Sources} ${Headers})
 
 target_link_libraries(test PUBLIC GenesisLib)
